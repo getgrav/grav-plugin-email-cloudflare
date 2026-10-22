@@ -33,10 +33,10 @@ final class PayloadTest extends TestCase
         $out = self::payload($email)['headers'];
 
         self::assertSame([
-            'X-Grav-Send-Id' => '41',
-            'X-Mailer' => 'Grav',
             'Organization' => 'Example Store',
             'Auto-Submitted' => 'auto-generated',
+            'X-Grav-Send-Id' => '41',
+            'X-Mailer' => 'Grav',
         ], $out);
     }
 
@@ -99,6 +99,38 @@ final class PayloadTest extends TestCase
         self::assertSame('inline', $attachments[1]['disposition']);
         self::assertSame(base64_encode('PNGDATA'), $attachments[1]['content']);
         self::assertNotSame('', $attachments[1]['content_id']);
+    }
+
+    /** Symfony writes `cid:<name>` into the HTML; it has to match the id the image is sent with. */
+    public function testAnInlineImagesReferenceMatchesItsContentId(): void
+    {
+        $email = self::email()->html('<p><img src="cid:logo.png"></p>')->embed('PNGDATA', 'logo.png', 'image/png');
+
+        $json = self::payload($email);
+        $cid = $json['attachments'][0]['content_id'];
+
+        self::assertNotSame('logo.png', $cid);
+        self::assertSame('<p><img src="cid:' . $cid . '"></p>', $json['html']);
+    }
+
+    /** Over 16 KB of custom headers the send is refused, so the header that would cross it stays out. */
+    public function testCustomHeadersStayUnderCloudflaresTotal(): void
+    {
+        $email = self::email();
+        for ($i = 1; $i <= 9; $i++) {
+            $email->getHeaders()->addTextHeader('X-Big-' . $i, str_repeat('a', 2000));
+        }
+        $email->getHeaders()->addTextHeader('List-Unsubscribe', '<https://example.com/u/abc>');
+
+        $headers = self::payload($email)['headers'];
+        $total = 0;
+        foreach ($headers as $name => $value) {
+            $total += \strlen($name) + \strlen($value) + 4;
+        }
+
+        self::assertLessThanOrEqual(Payload::MAX_TOTAL, $total);
+        self::assertArrayHasKey('List-Unsubscribe', $headers, 'the named headers are counted first');
+        self::assertCount(8, array_filter(array_keys($headers), static fn (string $n): bool => str_starts_with($n, 'X-Big-')));
     }
 
     private static function email(): Email

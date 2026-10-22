@@ -69,6 +69,9 @@ final class Payload
     /** Cloudflare's limit on one header value, in bytes. */
     public const MAX_VALUE = 2048;
 
+    /** Cloudflare's limit on all custom headers together, in bytes. */
+    public const MAX_TOTAL = 16384;
+
     /**
      * @param list<Address> $recipients the envelope's recipients, less cc and bcc
      * @return array<string, mixed>
@@ -101,15 +104,16 @@ final class Payload
             $payload['text'] = $text;
         }
 
+        $attachments = self::attachments($email);
+
         $html = $email->getHtmlBody();
         if (\is_resource($html)) {
             $html = stream_get_contents($html);
         }
         if (\is_string($html) && $html !== '') {
-            $payload['html'] = $html;
+            $payload['html'] = self::inlineReferences($html, $attachments);
         }
 
-        $attachments = self::attachments($email);
         if ($attachments !== []) {
             $payload['attachments'] = $attachments;
         }
@@ -130,6 +134,7 @@ final class Payload
     public static function headers(Headers $headers): array
     {
         $out = [];
+        $budget = self::MAX_TOTAL;
 
         foreach ($headers->all() as $header) {
             $name = $header->getName();
@@ -153,7 +158,31 @@ final class Payload
             $out[$name] = $value;
         }
 
-        return self::unsubscribe($out);
+        $out = self::unsubscribe($out);
+
+        // Past Cloudflare's total for custom headers the whole send is
+        // refused, so a header that would cross it is left out instead. The
+        // named ones (List-Unsubscribe first among them) are counted before
+        // the X- ones, so a pile of custom headers cannot cost the message its
+        // unsubscribe button.
+        $kept = [];
+        foreach ([false, true] as $customPass) {
+            foreach ($out as $name => $value) {
+                if ((stripos($name, 'x-') === 0) !== $customPass) {
+                    continue;
+                }
+
+                $cost = \strlen($name) + \strlen($value) + 4;
+                if ($cost > $budget) {
+                    continue;
+                }
+
+                $budget -= $cost;
+                $kept[$name] = $value;
+            }
+        }
+
+        return $kept;
     }
 
     /**
@@ -190,6 +219,29 @@ final class Payload
         }
 
         return $headers;
+    }
+
+    /**
+     * An inline image's HTML reference, pointed at the id it is sent with.
+     *
+     * Symfony embeds an image by name and writes `cid:logo.png` into the
+     * HTML, then swaps that for the part's real Content-ID only when it builds
+     * a MIME message, which an API transport never does. So the swap happens
+     * here: `cid:<filename>` becomes `cid:<content_id>` for every inline part.
+     *
+     * @param list<array<string, string>> $attachments
+     */
+    private static function inlineReferences(string $html, array $attachments): string
+    {
+        foreach ($attachments as $row) {
+            if (($row['disposition'] ?? '') !== 'inline' || ($row['content_id'] ?? '') === '') {
+                continue;
+            }
+
+            $html = str_replace('cid:' . $row['filename'], 'cid:' . $row['content_id'], $html);
+        }
+
+        return $html;
     }
 
     /**

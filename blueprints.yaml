@@ -19,7 +19,7 @@ compatibility:
 
 dependencies:
   - { name: grav, version: '>=1.7.0' }
-  - { name: email, version: '>=4.0.0' }
+  - { name: email, version: '>=5.3.3' }
 
 form:
   validation: loose

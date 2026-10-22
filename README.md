@@ -2,7 +2,7 @@
 
 The **Email Cloudflare** plugin is an extension for [Grav CMS](https://github.com/getgrav/grav). It sends your site's mail through [Cloudflare Email Service](https://developers.cloudflare.com/email-service/), over Cloudflare's REST API or over SMTP.
 
-It needs **PHP 8.1 or newer**, the [Email](https://github.com/getgrav/grav-plugin-email) plugin, a Cloudflare account on the **Workers Paid** plan, and a sending domain whose DNS is on Cloudflare.
+It needs **PHP 8.1 or newer**, the [Email](https://github.com/getgrav/grav-plugin-email) plugin 5.3.3 or newer (which is what tells newsletter add-ons that Cloudflare is for transactional mail only), a Cloudflare account on the **Workers Paid** plan, and a sending domain whose DNS is on Cloudflare.
 
 ## Transactional mail only
 
