@@ -1,0 +1,62 @@
+name: Email Cloudflare
+slug: email-cloudflare
+type: plugin
+version: 1.0.0
+testing: false
+description: Cloudflare Email Service integration for the Email plugin (API and SMTP), for transactional mail
+icon: envelope
+author:
+  name: Team Grav
+  email: devs@getgrav.org
+homepage: https://github.com/getgrav/grav-plugin-email-cloudflare
+keywords: grav, plugin, email, cloudflare, smtp, api, transactional
+bugs: https://github.com/getgrav/grav-plugin-email-cloudflare/issues
+docs: https://github.com/getgrav/grav-plugin-email-cloudflare/blob/develop/README.md
+license: MIT
+
+compatibility:
+  grav: ['1.7', '2.0']
+
+dependencies:
+  - { name: grav, version: '>=1.7.0' }
+  - { name: email, version: '>=4.0.0' }
+
+form:
+  validation: loose
+  fields:
+    enabled:
+      type: toggle
+      label: PLUGIN_ADMIN.PLUGIN_STATUS
+      highlight: 1
+      default: 0
+      options:
+        1: PLUGIN_ADMIN.ENABLED
+        0: PLUGIN_ADMIN.DISABLED
+      validate:
+        type: bool
+
+    note:
+      type: display
+      label: ''
+      markdown: true
+      content: PLUGIN_EMAIL_CLOUDFLARE.NOTE
+
+    transport:
+      type: select
+      size: small
+      label: PLUGIN_EMAIL_CLOUDFLARE.TRANSPORT
+      default: api
+      help: PLUGIN_EMAIL_CLOUDFLARE.TRANSPORT_HELP
+      options:
+        api: PLUGIN_EMAIL_CLOUDFLARE.TRANSPORT_API
+        smtp: PLUGIN_EMAIL_CLOUDFLARE.TRANSPORT_SMTP
+
+    account_id:
+      type: text
+      label: PLUGIN_EMAIL_CLOUDFLARE.ACCOUNT_ID
+      help: PLUGIN_EMAIL_CLOUDFLARE.ACCOUNT_ID_HELP
+
+    api_token:
+      type: password
+      label: PLUGIN_EMAIL_CLOUDFLARE.API_TOKEN
+      help: PLUGIN_EMAIL_CLOUDFLARE.API_TOKEN_HELP

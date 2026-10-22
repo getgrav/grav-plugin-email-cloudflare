@@ -1,0 +1,12 @@
+PLUGIN_EMAIL_CLOUDFLARE:
+  NOTE: "Cloudflare only allows **transactional mail**: order confirmations, password resets, notifications and the like. Newsletters and other bulk mail are not allowed, so a newsletter add-on will not send campaigns through Cloudflare."
+  TRANSPORT: "Transport"
+  TRANSPORT_HELP: "API is the faster of the two. Choose SMTP if your host blocks outbound API calls but allows port 465. Both use the API token below; SMTP does not need the account ID."
+  TRANSPORT_API: "API (faster)"
+  TRANSPORT_SMTP: "SMTP"
+  ACCOUNT_ID: "Account ID"
+  ACCOUNT_ID_HELP: "The ID of the Cloudflare account that owns your sending domain. It is on the account's overview page in the Cloudflare dashboard, under API."
+  API_TOKEN: "API token"
+  API_TOKEN_HELP: "A Cloudflare API token with the Email Sending: Edit permission on that account. In Cloudflare, open My Profile, API Tokens, Create Token, and make a custom token with that one permission. Your sending domain must be onboarded under Compute, Email Service, Email Sending first."
+  PROVIDER_INSTRUCTIONS: "Cloudflare has no delivery webhooks, so there is no address to register. In Cloudflare, open Compute, Email Service, Email Sending and press Onboard Domain for the domain you send from. Cloudflare adds the DNS records itself."
+  ECHO_NOTE: "Cloudflare has no delivery webhooks. Its delivery events go to a Cloudflare Queue instead, so nothing on this site hears what happened to a message after it left. Cloudflare stops sending to an address that bounced or complained on its own."

@@ -1,0 +1,21 @@
+{
+    "name": "getgrav/email-cloudflare-tests",
+    "description": "Test harness for the Email Cloudflare plugin. Symfony Mailer is here at the 5.4 line the Email plugin ships, which is what the transport tests are for.",
+    "type": "project",
+    "license": "MIT",
+    "require-dev": {
+        "phpunit/phpunit": "^11.5",
+        "symfony/http-client": "^5.4",
+        "symfony/mailer": "^5.4",
+        "symfony/mime": "^5.4"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Grav\\Plugin\\EmailCloudflare\\": "../classes/",
+            "Grav\\Plugin\\EmailCloudflare\\Tests\\": "./"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

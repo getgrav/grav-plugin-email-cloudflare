@@ -1,0 +1,38 @@
+{
+  "name": "getgrav/grav-plugin-email-cloudflare",
+  "type": "grav-plugin",
+  "description": "Cloudflare Email Service integration for the Grav Email plugin",
+  "keywords": ["grav", "email", "cloudflare", "plugin"],
+  "homepage": "https://github.com/getgrav/grav-plugin-email-cloudflare",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Team Grav",
+      "email": "devs@getgrav.org",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "replace": {
+    "symfony/mailer": "*",
+    "symfony/mime": "*",
+    "symfony/http-client": "*",
+    "symfony/http-client-contracts": "*",
+    "psr/event-dispatcher": "*",
+    "psr/log": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Grav\\Plugin\\EmailCloudflare\\": "classes/"
+    },
+    "classmap": ["email-cloudflare.php"]
+  },
+  "config": {
+    "platform": {
+      "php": "8.1.0"
+    },
+    "sort-packages": true
+  }
+}
